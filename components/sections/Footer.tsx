@@ -12,8 +12,8 @@ interface SocialLink {
 }
 
 const socialLinks: SocialLink[] = [
-  { name: 'Twitter', href: '', icon: FaXTwitter },
-  { name: 'LinkedIn', href: '', icon: FaLinkedin },
+  { name: 'Twitter', href: '#', icon: FaXTwitter },
+  { name: 'LinkedIn', href: '#', icon: FaLinkedin },
   { name: 'GitHub', href: '', icon: FaGithub },
   { name: 'Instagram', href: '', icon: FaInstagram },
 ];
@@ -45,7 +45,7 @@ export default function Footer() {
           {/* Quick Links Hover Area */}
           <div className="flex items-start justify-start md:justify-end">
             <div 
-              className="relative"
+              className=""
               onMouseEnter={() => setShowDock(true)}
               onMouseLeave={() => setShowDock(false)}
             >
@@ -56,39 +56,38 @@ export default function Footer() {
                 viewport={{ once: true }}
                 className="cursor-pointer"
               >
-                <h3 className="text-white font-semibold mb-2 hover:text-gray-300 transition-colors">
+                <h3 className="text-white font-semibold mb-2 hover:text-gray-300 transition-colors ">
                   Quick Links
                 </h3>
-                <p className="text-gray-500 text-sm">Hover to connect</p>
+                {/* <p className="text-gray-500 text-sm">Hover to connect</p> */}
               </motion.div>
 
-              {/* Dock Component */}
               <AnimatePresence>
-                {showDock && (
+                
                   <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-0 mt-4 right-0 md:right-auto md:left-0  z-50"
+                    className="m-0"
                   >
-                    <Dock direction="middle" className="bg-black/80 backdrop-blur-md border border-white/20">
+                    <div className=" flex flex-row flex-wrap">
                       {socialLinks.map((link) => (
-                        <DockIcon key={link.name}>
+                        <div key={link.name}>
                           <a
                             href={link.href}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 transition-all duration-300 group"
+                            className="flex items-center justify-center w-12 h-12 rounded-full hover:bg-white/10 transition-all duration-300 "
                             aria-label={link.name}
                           >
-                            <link.icon className="w-5 h-5 text-gray-400 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+                            <link.icon className="w-5 h-5 text-white group-hover:text-white group-hover:scale-110 transition-all duration-300" />
                           </a>
-                        </DockIcon>
+                        </div>
                       ))}
-                    </Dock>
+                    </div>
                   </motion.div>
-                )}
+                
               </AnimatePresence>
             </div>
           </div>
