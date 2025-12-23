@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/sections/Footer";
+import UnifiedHeader from "@/components/sections/Header";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,13 +50,13 @@ export const metadata: Metadata = {
   },
 
 
-  // icons: {
-  //   icon: [
-  //     { url: "/favicon.ico", sizes: "any" },
-  //     { url: "/icon.svg", type: "image/svg+xml" },
-  //   ],
-  //   apple: [{ url: "/apple-touch-icon.png" }],
-  // },
+  icons: {
+    icon: [
+      { url: "/OneAppLogo.png", sizes: "any" },
+      // { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+   
+  },
   // manifest: "/manifest.json",
   // viewport: {
   //   width: "device-width",
@@ -102,24 +105,37 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-gray-950 text-white min-h-screen overflow-x-hidden`}
         suppressHydrationWarning
       >
+
+        <UnifiedHeader
+          logo="/OneAppLogo.png"
+          logoAlt="OneApp Logo"
+          items={[
+            { label: 'Home', href: '#home' },
+            { label: 'Vision', href: '#vision' },
+            { label: 'Survey', href: '#survey' },
+            { label: 'Contact', href: '#contact' }
+          ]}
+          activeHref="/"
+          socialItems={[
+            { label: 'Twitter', link: 'https://x.com' },
+            { label: 'LinkedIn', link: 'https://www.linkedin.com/' },
+            { label: 'GitHub', link: 'https://github.com' }
+          ]}
+        />
+        
         {/* Main Content Wrapper */}
         <div className="relative isolate">
           {/* Background Elements */}
           
 
-          {/* Skip to Main Content (Accessibility) */}
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-6 focus:py-3"
-          >
-            Skip to main content
-          </a>
+         
 
           {/* Main Content */}
           <main id="main-content" className="relative">
             {children}
           </main>
         </div>
+        <Footer/>
 
         {/* Portal Root for Modals, Toasts, etc. */}
         <div id="portal-root" />

@@ -5,9 +5,10 @@ import ScrollProgress from "@/components/sections/ScrollProgress"
 import Mission from "@/components/sections/Mission";
 import MissionScrollStack from "@/components/sections/Missions";
 import ContactSection from "@/components/sections/ContactUs";
-import Footer from "@/components/sections/Footer";
 
 import Survery from "@/components/sections/SurveryCategories";
+
+import PillNav from "@/components/sections/Header";
 
 
 export default function Home() {
@@ -17,23 +18,29 @@ export default function Home() {
 
       <ScrollProgress />
       <main>
+         <section id="home">
           <ParallaxHero/>
+         </section>
 
-          <OurVision/>
+          <section id="vision">
+            <OurVision/>
+          </section>
 
-          <Mission/>
+          <section id="mission">
+            <Mission/>
+          </section>
           
           {/* <MissionScrollStack/> */}
 
-          <section>
+          <section id="contact">
               <ContactSection/>
           </section>
 
-          <section>
+          <section id="survey">
             <Survery/>
           </section>
 
-          <Footer/>
+          
           
       </main>
     </>

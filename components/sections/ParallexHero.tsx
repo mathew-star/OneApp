@@ -36,7 +36,7 @@ export default function ParallaxHero() {
     <section
       ref={ref}
       onMouseMove={handleMouseMove}
-      className="relative h-screen overflow-hidden bg-gray-950"
+      className="relative min-h-screen h-auto md:h-screen overflow-hidden bg-gray-950 pt-25 md:pt-0"
       aria-label="Hero section"
     >
       {/* Animated background grid */}
@@ -64,7 +64,7 @@ export default function ParallaxHero() {
           {/* Left content */}
           <motion.div
             style={{ x: mouseX, y: mouseY }}
-            className="relative text-left space-y-6 lg:space-y-8"
+            className="relative text-left space-y-4 me-10 sm:space-y-6 lg:space-y-8"
           >
             {/* Badge */}
             <motion.div
