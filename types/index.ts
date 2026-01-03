@@ -49,3 +49,12 @@ export interface ScrollStackProps {
   itemDistance?: number;
   stackEffect?: boolean;
 }
+
+
+export interface SurveyCategory {
+  title: string;
+  subtitle: string;
+  icon: string;
+  description: string;
+  formUrl: string;
+}

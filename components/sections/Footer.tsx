@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaXTwitter, FaLinkedin, FaInstagram, FaGithub } from "react-icons/fa6";
+import { FaDiscord } from "react-icons/fa";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { useState } from 'react';
 
@@ -12,10 +13,10 @@ interface SocialLink {
 }
 
 const socialLinks: SocialLink[] = [
-  { name: 'Twitter', href: '#', icon: FaXTwitter },
+  // { name: 'Twitter', href: '#', icon: FaXTwitter },
   { name: 'LinkedIn', href: '#', icon: FaLinkedin },
-  { name: 'GitHub', href: '', icon: FaGithub },
-  { name: 'Instagram', href: '', icon: FaInstagram },
+  // { name: 'GitHub', href: '', icon: FaGithub },
+  { name: 'Discord', href: 'https://discord.gg/CgkQmag3N2', icon: FaDiscord },
 ];
 
 export default function Footer() {

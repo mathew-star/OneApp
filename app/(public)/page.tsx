@@ -1,3 +1,4 @@
+
 import { SmoothCursor } from "@/components/ui/smooth-cursor";
 import ParallaxHero from "@/components/sections/ParallexHero";
 import OurVision from "@/components/sections/OurVision";
@@ -18,6 +19,7 @@ export default function Home() {
 
       <ScrollProgress />
       <main>
+       
          <section id="home">
           <ParallaxHero/>
          </section>
@@ -29,6 +31,8 @@ export default function Home() {
           <section id="mission">
             <Mission/>
           </section>
+
+           
           
           {/* <MissionScrollStack/> */}
 

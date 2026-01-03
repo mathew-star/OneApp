@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/sections/Footer";
 import UnifiedHeader from "@/components/sections/Header";
+import SmoothScroll from "@/components/SmoothScroll";
+
 
 
 const geistSans = Geist({
@@ -131,9 +133,12 @@ export default function RootLayout({
          
 
           {/* Main Content */}
-          <main id="main-content" className="relative">
-            {children}
-          </main>
+        
+          <SmoothScroll>
+            <main id="main-content" className="relative">
+             {children}
+            </main>
+          </SmoothScroll>
         </div>
         <Footer/>
 

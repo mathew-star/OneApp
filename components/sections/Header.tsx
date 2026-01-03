@@ -32,7 +32,6 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   ]
 }) => {
   // PillNav refs and state
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const circleRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const tlRefs = useRef<Array<gsap.core.Timeline | null>>([]);
   const activeTweenRefs = useRef<Array<gsap.core.Tween | null>>([]);
@@ -42,7 +41,11 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   const logoRef = useRef<HTMLAnchorElement | null>(null);
 
   // StaggeredMenu refs
-  const [open, setOpen] = useState(false);
+  const [Menuopen, setMenuOpen] = useState(false);
+
+  const [menuMounted, setMenuMounted] = useState(false);
+
+
   const openRef = useRef(false);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const preLayersRef = useRef<HTMLDivElement | null>(null);
@@ -173,103 +176,102 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   };
 
   // StaggeredMenu setup
+
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const panel = panelRef.current;
-      const preContainer = preLayersRef.current;
-      const plusH = plusHRef.current;
-      const plusV = plusVRef.current;
-      const icon = iconRef.current;
-      const textInner = textInnerRef.current;
+  if (!menuMounted) return;
 
-      if (!panel || !plusH || !plusV || !icon || !textInner) return;
-
-      let preLayers: HTMLElement[] = [];
-      if (preContainer) {
-        preLayers = Array.from(preContainer.querySelectorAll('.sm-prelayer')) as HTMLElement[];
-      }
-      preLayerElsRef.current = preLayers;
-
-      gsap.set([panel, ...preLayers], { xPercent: 100 });
-      gsap.set(plusH, { transformOrigin: '50% 50%', rotate: 0 });
-      gsap.set(plusV, { transformOrigin: '50% 50%', rotate: 90 });
-      gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%' });
-      gsap.set(textInner, { yPercent: 0 });
-      if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: '#e9e9ef' });
-    });
-    return () => ctx.revert();
-  }, []);
-
-  // StaggeredMenu animation functions
-  const buildOpenTimeline = useCallback(() => {
+  const ctx = gsap.context(() => {
     const panel = panelRef.current;
-    const layers = preLayerElsRef.current;
-    if (!panel) return null;
+    const preContainer = preLayersRef.current;
+    const plusH = plusHRef.current;
+    const plusV = plusVRef.current;
+    const icon = iconRef.current;
+    const textInner = textInnerRef.current;
 
-    openTlRef.current?.kill();
-    if (closeTweenRef.current) {
-      closeTweenRef.current.kill();
-      closeTweenRef.current = null;
-    }
+    if (!panel || !plusH || !plusV || !icon || !textInner) return;
 
-    const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel')) as HTMLElement[];
-    const socialTitle = panel.querySelector('.sm-socials-title') as HTMLElement | null;
-    const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link')) as HTMLElement[];
+    const preLayers = preContainer
+      ? (Array.from(preContainer.querySelectorAll('.sm-prelayer')) as HTMLElement[])
+      : [];
 
-    const layerStates = layers.map(el => ({ el, start: Number(gsap.getProperty(el, 'xPercent')) }));
-    const panelStart = Number(gsap.getProperty(panel, 'xPercent'));
+    preLayerElsRef.current = preLayers;
 
-    if (itemEls.length) gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-    if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-    if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+    gsap.set([panel, ...preLayers], { xPercent: 100 });
+    gsap.set(plusH, { rotate: 0, transformOrigin: '50% 50%' });
+    gsap.set(plusV, { rotate: 90, transformOrigin: '50% 50%' });
+    gsap.set(icon, { rotate: 0 });
+    gsap.set(textInner, { yPercent: 0 });
+  });
 
-    const tl = gsap.timeline({ paused: true });
+  return () => ctx.revert();
+}, [menuMounted]);
 
-    layerStates.forEach((ls, i) => {
-      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out' }, i * 0.07);
-    });
 
-    const lastTime = layerStates.length ? (layerStates.length - 1) * 0.07 : 0;
-    const panelInsertTime = lastTime + (layerStates.length ? 0.08 : 0);
-    const panelDuration = 0.65;
 
-    tl.fromTo(
-      panel,
-      { xPercent: panelStart },
-      { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
-      panelInsertTime
-    );
 
-    if (itemEls.length) {
-      const itemsStart = panelInsertTime + panelDuration * 0.15;
-      tl.to(
-        itemEls,
-        { yPercent: 0, rotate: 0, duration: 1, ease: 'power4.out', stagger: { each: 0.1, from: 'start' } },
-        itemsStart
-      );
-    }
+  const buildOpenTimeline = useCallback(() => {
+  const panel = panelRef.current;
+  const layers = preLayerElsRef.current;
 
-    if (socialTitle || socialLinks.length) {
-      const socialsStart = panelInsertTime + panelDuration * 0.4;
-      if (socialTitle) tl.to(socialTitle, { opacity: 1, duration: 0.5, ease: 'power2.out' }, socialsStart);
-      if (socialLinks.length) {
-        tl.to(
-          socialLinks,
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.55,
-            ease: 'power3.out',
-            stagger: { each: 0.08, from: 'start' }
-          },
-          socialsStart + 0.04
-        );
-      }
-    }
+  if (!panel) return null;
 
-    openTlRef.current = tl;
-    return tl;
-  }, []);
+  openTlRef.current?.kill();
+  closeTweenRef.current?.kill();
+
+  const items = Array.from(
+    panel.querySelectorAll('.sm-panel-itemLabel')
+  ) as HTMLElement[];
+
+  const socialsTitle = panel.querySelector('.sm-socials-title') as HTMLElement | null;
+  const socialsLinks = Array.from(
+    panel.querySelectorAll('.sm-socials-link')
+  ) as HTMLElement[];
+
+  gsap.set(items, { yPercent: 140, rotate: 10 });
+  gsap.set(socialsTitle, { opacity: 0 });
+  gsap.set(socialsLinks, { y: 25, opacity: 0 });
+
+  const tl = gsap.timeline({ paused: true });
+
+  layers.forEach((el, i) => {
+    tl.to(el, {
+      xPercent: 0,
+      duration: 0.5,
+      ease: 'power4.out',
+    }, i * 0.07);
+  });
+
+  const panelStart = layers.length * 0.07 + 0.08;
+
+  tl.to(panel, {
+    xPercent: 0,
+    duration: 0.65,
+    ease: 'power4.out',
+  }, panelStart);
+
+  tl.to(items, {
+    yPercent: 0,
+    rotate: 0,
+    duration: 1,
+    ease: 'power4.out',
+    stagger: 0.1,
+  }, panelStart + 0.15);
+
+  if (socialsTitle) {
+    tl.to(socialsTitle, { opacity: 1, duration: 0.4 }, panelStart + 0.4);
+  }
+
+  tl.to(socialsLinks, {
+    y: 0,
+    opacity: 1,
+    duration: 0.5,
+    stagger: 0.08,
+  }, panelStart + 0.45);
+
+  openTlRef.current = tl;
+  return tl;
+}, []);
+
 
   const playOpen = useCallback(() => {
     if (busyRef.current) return;
@@ -278,6 +280,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     if (tl) {
       tl.eventCallback('onComplete', () => {
         busyRef.current = false;
+        
       });
       tl.play(0);
     } else {
@@ -311,6 +314,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
         if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
 
         busyRef.current = false;
+        setMenuMounted(false);
       }
     });
   }, []);
@@ -370,64 +374,82 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
     });
   }, []);
 
+
+
+
+
+
+
   const toggleMenu = useCallback(() => {
-    const target = !openRef.current;
-    openRef.current = target;
-    setOpen(target);
-
-    if (target) {
-      playOpen();
-    } else {
-      playClose();
-    }
-
-    animateIcon(target);
-    animateText(target);
-  }, [playOpen, playClose, animateIcon, animateText]);
-
-  const closeMenu = useCallback(() => {
-    if (openRef.current) {
-      openRef.current = false;
-      setOpen(false);
-      playClose();
-      animateIcon(false);
-      animateText(false);
-    }
-  }, [playClose, animateIcon, animateText]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(event.target as Node) &&
-        toggleBtnRef.current &&
-        !toggleBtnRef.current.contains(event.target as Node)
-      ) {
-        closeMenu();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [open, closeMenu]);
-
-
-
-  useEffect(() => {
-  if (open) {
-    document.body.style.overflow = 'hidden';
+  if (!Menuopen) {
+    setMenuMounted(true);
+    setMenuOpen(true);
+    animateIcon(true);
+    animateText(true);
   } else {
-    document.body.style.overflow = '';
+    closeMenu();
+  }
+}, [Menuopen]);
+
+const closeMenu = useCallback(() => {
+  setMenuOpen(false);
+  animateIcon(false);
+  animateText(false);
+
+  const panel = panelRef.current;
+  if (!panel) {
+    setMenuMounted(false);
+    return;
   }
 
+  closeTweenRef.current = gsap.to(panel, {
+    xPercent: 100,
+    duration: 0.6,
+    ease: 'power4.inOut',
+    onComplete: () => {
+      setMenuMounted(false);
+    },
+  });
+}, [animateIcon, animateText]);
+
+
+
+
+  useEffect(() => {
+  if (!Menuopen || !menuMounted) return;
+
+  requestAnimationFrame(() => {
+    const tl = buildOpenTimeline();
+    tl?.play(0);
+  });
+}, [Menuopen, menuMounted, buildOpenTimeline]);
+
+
+useEffect(() => {
+  document.body.style.overflow = Menuopen ? 'hidden' : '';
   return () => {
     document.body.style.overflow = '';
   };
-}, [open]);
+}, [Menuopen]);
+
+
+useEffect(() => {
+  if (!Menuopen) return;
+
+  const handler = (e: MouseEvent) => {
+    if (
+      panelRef.current &&
+      !panelRef.current.contains(e.target as Node) &&
+      toggleBtnRef.current &&
+      !toggleBtnRef.current.contains(e.target as Node)
+    ) {
+      closeMenu();
+    }
+  };
+
+  document.addEventListener('mousedown', handler);
+  return () => document.removeEventListener('mousedown', handler);
+}, [Menuopen, closeMenu]);
 
 
   const isExternalLink = (href: string) =>
@@ -442,38 +464,33 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
   const isRouterLink = (href?: string) => href && !isExternalLink(href) && !isHashLink(href);
 
   const scrollToSection = (href: string) => {
-  const id = href.replace('#', '');
-    console.log(id)
+    const id = href.replace('#', '');
+    closeMenu();
 
-    console.log("starting to redirect")
-  closeMenu();
-
-  // IMPORTANT: wait for menu unmount + layout reflow
-  requestAnimationFrame(() => {
+    // Wait for menu unmount + layout reflow
     requestAnimationFrame(() => {
-      const el = document.getElementById(id);
-      if (!el) {
-        console.warn('Target not found:', id);
-        return;
-      }
+      requestAnimationFrame(() => {
+        const el = document.getElementById(id);
+        if (!el) {
+          console.warn('Target not found:', id);
+          return;
+        }
 
-      const yOffset = -120; // header height
-      const y =
-        el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        const yOffset = -120; // header height
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
-      window.scrollTo({
-        top: y,
-        behavior: 'smooth',
+        window.scrollTo({
+          top: y,
+          behavior: 'smooth',
+        });
       });
     });
-  });
-};
-
+  };
 
   return (
     <>
       {/* Desktop PillNav */}
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1000] hidden md:block">
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1000] hidden md:block">
         <nav
           className={`w-full md:w-max flex items-center justify-between md:justify-start box-border px-4 md:px-0 ${className}`}
           aria-label="Primary"
@@ -523,7 +540,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         onMouseLeave={() => handleLeave(i)}
                       >
                         <span
-                          className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block  bg-white"
+                          className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block bg-white"
                           aria-hidden="true"
                           ref={el => {
                             circleRefs.current[i] = el;
@@ -562,7 +579,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                         onMouseLeave={() => handleLeave(i)}
                       >
                         <span
-                          className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block pointer-events-none bg-white"
+                          className="hover-circle absolute left-1/2 bottom-0 rounded-full z-[1] block bg-white"
                           aria-hidden="true"
                           ref={el => {
                             circleRefs.current[i] = el;
@@ -595,100 +612,99 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
         </nav>
       </div>
 
-      {/* Mobile StaggeredMenu */}
-    <div className="md:hidden fixed top-0 left-0 w-screen h-screen z-[1000] ">
-        <div className="staggered-menu-wrapper relative w-full h-full z-40">
-          <div
-            ref={preLayersRef}
-            className="sm-prelayers absolute top-0 right-0 bottom-0  z-[5]"
+      {/* Mobile Header - Always visible */}
+      <header
+        className="md:hidden fixed top-0 left-0 w-full flex items-center justify-between p-6 bg-transparent z-[1001] pointer-events-none"
+        aria-label="Main navigation header"
+      >
+        <Link href="/" className="flex items-center select-none pointer-events-auto" aria-label="Logo">
+          <img
+            src={logo}
+            alt={logoAlt}
+            className="block h-8 w-auto object-contain"
+            draggable={false}
+          />
+        </Link>
+
+        <button
+          ref={toggleBtnRef}
+          className="relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none text-white pointer-events-auto"
+          aria-label={Menuopen ? 'Close menu' : 'Open menu'}
+          aria-expanded={Menuopen}
+          onClick={toggleMenu}
+          type="button"
+        >
+          <span
+            className="relative inline-block h-[1em] overflow-hidden whitespace-nowrap"
             aria-hidden="true"
           >
-            {['#1a1a1f', '#2d2d35'].map((c, i) => (
-              <div
-                key={i}
-                className="sm-prelayer absolute top-0 right-0 h-full w-full"
-                style={{ background: c }}
-              />
-            ))}
-          </div>
-
-          <header
-            className="absolute top-0 left-0 w-full flex items-center justify-between p-[2em] bg-transparent z-20"
-            aria-label="Main navigation header"
-          >
-            <Link href="/" className="flex items-center select-none pointer-events-auto" aria-label="Logo">
-              <img
-                src={logo}
-                alt={logoAlt}
-                className="block h-8 w-auto object-contain"
-                draggable={false}
-              />
-            </Link>
-
-            <button
-              ref={toggleBtnRef}
-              className="relative inline-flex items-center gap-[0.3rem] bg-transparent border-0 cursor-pointer font-medium leading-none overflow-visible pointer-events-auto text-white"
-              aria-label={open ? 'Close menu' : 'Open menu'}
-              aria-expanded={open}
-              onClick={toggleMenu}
-              type="button"
-            >
-              <span
-                className="relative inline-block h-[1em] overflow-hidden whitespace-nowrap"
-                aria-hidden="true"
-              >
-                <span ref={textInnerRef} className="flex flex-col leading-none">
-                  {textLines.map((l, i) => (
-                    <span className="block h-[1em] leading-none" key={i}>
-                      {l}
-                    </span>
-                  ))}
+            <span ref={textInnerRef} className="flex flex-col leading-none">
+              {textLines.map((l, i) => (
+                <span className="block h-[1em] leading-none" key={i}>
+                  {l}
                 </span>
-              </span>
+              ))}
+            </span>
+          </span>
 
-              <span
-                ref={iconRef}
-                className="relative w-[14px] h-[14px] shrink-0 inline-flex items-center justify-center"
-                aria-hidden="true"
-              >
-                <span
-                  ref={plusHRef}
-                  className="absolute left-1/2 top-1/2 w-full h-[2px] bg-current rounded-[2px] -translate-x-1/2 -translate-y-1/2"
-                />
-                <span
-                  ref={plusVRef}
-                  className="absolute left-1/2 top-1/2 w-full h-[2px] bg-current rounded-[2px] -translate-x-1/2 -translate-y-1/2"
-                />
-              </span>
-            </button>
-          </header>
-
-          <aside
-            ref={panelRef}
-            className="absolute top-0 right-0 h-full bg-black/30 flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] w-full"
-            style={{ WebkitBackdropFilter: 'blur(12px)' }}
-            aria-hidden={!open}
+          <span
+            ref={iconRef}
+            className="relative w-[14px] h-[14px] shrink-0 inline-flex items-center justify-center"
+            aria-hidden="true"
           >
-            <div className="flex-1 flex flex-col gap-5">
-              <ul className="list-none m-0 p-0 flex flex-col gap-2" role="list">
-                {items.map((it, idx) => {
-                
-                  const isHash = isHashLink(it.href);
-                 
-                  
-                  return (
-                    <li className="relative overflow-hidden leading-none" key={it.label + idx}>
-                       
-                      <a
+            <span
+              ref={plusHRef}
+              className="absolute left-1/2 top-1/2 w-full h-[2px] bg-current rounded-[2px] -translate-x-1/2 -translate-y-1/2"
+            />
+            <span
+              ref={plusVRef}
+              className="absolute left-1/2 top-1/2 w-full h-[2px] bg-current rounded-[2px] -translate-x-1/2 -translate-y-1/2"
+            />
+          </span>
+        </button>
+      </header>
+
+      {/* Mobile StaggeredMenu - Only mounts when open */}
+      {menuMounted    && (
+        <div className="md:hidden fixed top-0 left-0 w-screen h-screen z-[1000]">
+          <div className="staggered-menu-wrapper relative w-full h-full">
+            <div
+              ref={preLayersRef}
+              className="sm-prelayers absolute top-0 right-0 bottom-0 z-[5]"
+              aria-hidden="true"
+            >
+              {['#1a1a1f', '#2d2d35'].map((c, i) => (
+                <div
+                  key={i}
+                  className="sm-prelayer absolute top-0 right-0 h-full w-full"
+                  style={{ background: c }}
+                />
+              ))}
+            </div>
+
+            <aside
+              ref={panelRef}
+              className="absolute top-0 right-0 h-full bg-black/30 flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-[12px] w-full"
+              style={{ WebkitBackdropFilter: 'blur(12px)' }}
+              aria-hidden={!Menuopen}
+            >
+              <div className="flex-1 flex flex-col gap-5">
+                <ul className="list-none m-0 p-0 flex flex-col gap-2" role="list">
+                  {items.map((it, idx) => {
+                    const isHash = isHashLink(it.href);
+                    
+                    return (
+                      <li className="relative overflow-hidden leading-none" key={it.label + idx}>
+                        <a
                           href={it.href}
                           onClick={(e) => {
-                        if (isHash) {
-                        e.preventDefault();
-                        scrollToSection(it.href);
-                        } else {
-                        closeMenu();
-                        }
-                    }}
+                            if (isHash) {
+                              e.preventDefault();
+                              scrollToSection(it.href);
+                            } else {
+                              closeMenu();
+                            }
+                          }}
                           className="relative text-white font-semibold text-[3rem] cursor-pointer leading-none tracking-[-2px] uppercase inline-block no-underline hover:text-purple-600 transition-colors duration-200"
                           aria-label={it.ariaLabel}
                         >
@@ -696,34 +712,35 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
                             {it.label}
                           </span>
                         </a>
-                    </li>
-                  );
-                })}
-              </ul>
-
-              {socialItems && socialItems.length > 0 && (
-                <div className="mt-auto pt-8 flex flex-col gap-3" aria-label="Social links">
-                  <h3 className="sm-socials-title m-0 text-base font-medium text-purple-600">Socials</h3>
-                  <ul className="list-none m-0 p-0 flex flex-row items-center gap-4 flex-wrap" role="list">
-                    {socialItems.map((s, i) => (
-                      <li key={s.label + i}>
-                        <a
-                          href={s.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="sm-socials-link text-[1.2rem] font-medium text-white no-underline hover:text-purple-600 transition-colors duration-300"
-                        >
-                          {s.label}
-                        </a>
                       </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </aside>
+                    );
+                  })}
+                </ul>
+
+                {socialItems && socialItems.length > 0 && (
+                  <div className="mt-auto pt-8 flex flex-col gap-3" aria-label="Social links">
+                    <h3 className="sm-socials-title m-0 text-base font-medium text-purple-600">Socials</h3>
+                    <ul className="list-none m-0 p-0 flex flex-row items-center gap-4 flex-wrap" role="list">
+                      {socialItems.map((s, i) => (
+                        <li key={s.label + i}>
+                          <a
+                            href={s.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="sm-socials-link text-[1.2rem] font-medium text-white no-underline hover:text-purple-600 transition-colors duration-300"
+                          >
+                            {s.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </aside>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

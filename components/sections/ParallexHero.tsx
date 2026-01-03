@@ -207,7 +207,7 @@ export default function ParallaxHero() {
           repeat: Infinity,
           ease: 'easeInOut',
         }}
-        className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute top-1/4 left-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-primary/10 rounded-full blur-3xl "
         aria-hidden="true"
       />
       <motion.div
@@ -221,7 +221,7 @@ export default function ParallaxHero() {
           ease: 'easeInOut',
           delay: 1,
         }}
-        className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"
+        className="absolute bottom-1/4 right-1/4 w-48 h-48 sm:w-64 sm:h-64 bg-purple-500/10 rounded-full blur-3xl"
         aria-hidden="true"
       />
 
