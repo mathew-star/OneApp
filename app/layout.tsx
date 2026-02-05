@@ -54,7 +54,7 @@ export const metadata: Metadata = {
 
   icons: {
     icon: [
-      { url: "/OneAppLogo.png", sizes: "any" },
+      { url: "/dcatzoon.jpeg", sizes: "any" },
       // { url: "/icon.svg", type: "image/svg+xml" },
     ],
    
@@ -109,7 +109,7 @@ export default function RootLayout({
       >
 
         <UnifiedHeader
-          logo="/OneAppLogo.png"
+          logo="/dcatzoon.jpeg"
           logoAlt="OneApp Logo"
           items={[
             { label: 'Home', href: '#home' },

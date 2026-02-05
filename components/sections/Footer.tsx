@@ -16,7 +16,7 @@ const socialLinks: SocialLink[] = [
   // { name: 'Twitter', href: '#', icon: FaXTwitter },
   { name: 'LinkedIn', href: '#', icon: FaLinkedin },
   // { name: 'GitHub', href: '', icon: FaGithub },
-  { name: 'Discord', href: 'https://discord.gg/CgkQmag3N2', icon: FaDiscord },
+  { name: 'Discord', href: 'https://discord.gg/jUkMhQgnX2', icon: FaDiscord },
 ];
 
 export default function Footer() {

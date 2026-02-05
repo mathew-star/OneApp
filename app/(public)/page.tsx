@@ -15,7 +15,7 @@ import PillNav from "@/components/sections/Header";
 export default function Home() {
   return (
     <>
-      <SmoothCursor/>
+      {/* <SmoothCursor/> */}
 
       <ScrollProgress />
       <main>
